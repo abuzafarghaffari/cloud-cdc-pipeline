@@ -1,0 +1,15 @@
+resources:
+  jobs:
+    connection_test_job:
+      name: cloud-cdc-connection-test
+
+      tasks:
+        - task_key: test_spark
+          spark_python_task:
+            python_file: ../connection_test.py
+          environment_key: default
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "2"
