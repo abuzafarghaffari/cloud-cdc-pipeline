@@ -1,0 +1,15 @@
+resources:
+  jobs:
+    silver_transformation_job:
+      name: cloud-cdc-silver-transformation
+
+      tasks:
+        - task_key: transform_customers
+          spark_python_task:
+            python_file: ../src/silver.py
+          environment_key: default
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "2"

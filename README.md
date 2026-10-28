@@ -1,0 +1,2 @@
+Problem Statement
+Transactional customer and account records are exported periodically into cloud object storage (Azure Blob / AWS S3). The target warehouse needs continuous synchronization using Change Data Capture (CDC) without reprocessing the entire dataset on every run.

@@ -1,0 +1,15 @@
+resources:
+  jobs:
+    customer_cdc_merge_job:
+      name: cloud-cdc-customer-merge
+
+      tasks:
+        - task_key: merge_customers
+          spark_python_task:
+            python_file: ../src/cdc_merge.py
+          environment_key: default
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "2"
