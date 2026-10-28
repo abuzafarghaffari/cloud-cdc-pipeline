@@ -1,0 +1,75 @@
+
+resources:
+  jobs:
+    customer_pipeline_job:
+      name: cloud-cdc-production-pipeline
+
+      max_concurrent_runs: 1
+
+      tasks:
+
+        # Task 1: Bronze Auto Loader
+        - task_key: bronze_ingestion
+
+          spark_python_task:
+            python_file: ../src/bronze.py
+
+          environment_key: default
+
+          timeout_seconds: 1800
+          max_retries: 2
+          min_retry_interval_millis: 30000
+          retry_on_timeout: true
+
+        # Task 2: CDC MERGE
+        - task_key: cdc_processing
+
+          depends_on:
+            - task_key: bronze_ingestion
+
+          spark_python_task:
+            python_file: ../src/cdc_stream.py
+
+          environment_key: default
+
+          timeout_seconds: 1800
+          max_retries: 2
+          min_retry_interval_millis: 30000
+          retry_on_timeout: true
+
+        # Task 3: Data Quality
+        - task_key: data_quality
+
+          depends_on:
+            - task_key: cdc_processing
+
+          spark_python_task:
+            python_file: ../src/data_quality.py
+           
+
+          environment_key: default
+
+          timeout_seconds: 600
+          max_retries: 0
+
+        # Task 4: Gold Reporting
+        - task_key: gold_reporting
+
+          depends_on:
+            - task_key: data_quality
+
+          run_if: ALL_SUCCESS
+
+          spark_python_task:
+            python_file: ../src/gold.py
+
+          environment_key: default
+
+          timeout_seconds: 900
+          max_retries: 1
+          min_retry_interval_millis: 30000
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "2"
